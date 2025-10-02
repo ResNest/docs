@@ -1,0 +1,42 @@
+name: Documentation Linting (CI)
+
+on:
+  # This runs the checks on every commit to a pull request against main
+  pull_request:
+    branches: [main]
+  
+  # Also run on direct pushes to main (though protected branches should prevent this)
+  push:
+    branches: [main]
+
+jobs:
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # --- LINTING & VALIDATION STEPS ---
+      
+      # 1. Run Markdown Linting
+      # This checks for style, formatting, and common Markdown errors.
+      - name: Markdown Linting Check
+        uses: DavidAnson/markdownlint-cli2-action@v1 # A popular, reliable linter action
+        with:
+          # This glob pattern ensures all Markdown files in the entire repo are checked
+          globs: '**/*.md'
+          # If you created a custom configuration file, reference it here:
+          # config: '.markdownlint.json'
+
+      # 2. Check for Broken Links
+      # This is critical for documentation, ensuring all external and internal links work.
+      - name: Check for Broken Links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          # Check all Markdown files
+          use-quiet-mode: 'yes'
+          folder-path: './'
+          # Use the 'check-modified-files-only' option for speed on PRs
+          # check-modified-files-only: 'yes'
+          
+      # --- END VALIDATION STEPS ---
